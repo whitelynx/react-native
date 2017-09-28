@@ -92,6 +92,9 @@ const TextStylePropTypes = {
   writingDirection: ReactPropTypes.oneOf(
     ['auto' /*default*/, 'ltr', 'rtl']
   ),
+  textTransform: ReactPropTypes.oneOf(
+    ['none' /*default*/, 'capitalize', 'uppercase', 'lowercase']
+  ),
 };
 
 module.exports = TextStylePropTypes;

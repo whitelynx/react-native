@@ -24,6 +24,7 @@ const Touchable = require('Touchable');
 
 const createReactClass = require('create-react-class');
 const createReactNativeComponentClass = require('createReactNativeComponentClass');
+const flattenStyle = require('flattenStyle');
 const mergeFast = require('mergeFast');
 const processColor = require('processColor');
 
@@ -43,6 +44,16 @@ const viewConfig = {
     textBreakStrategy: true,
   }),
   uiViewClassName: 'RCTText',
+};
+
+const textTransformFunctions = {
+  capitalize: s =>
+    s
+      .split(/(\s+)/g)
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join(''),
+  uppercase: s => s.toUpperCase(),
+  lowercase: s => s.toLowerCase()
 };
 
 /**
@@ -545,6 +556,21 @@ const Text = createReactClass({
       newProps = {
         ...newProps,
         selectionColor: processColor(newProps.selectionColor)
+      };
+    }
+    const computedStyle = flattenStyle(newProps.style);
+    if (computedStyle && computedStyle.textTransform) {
+      const transformFunc = textTransformFunctions[computedStyle.textTransform];
+      let children = newProps.children;
+      if (typeof children === 'string') {
+        children = transformFunc(children);
+      } else if (Array.isArray(children)) {
+        children = children.map(child =>
+          typeof child === 'string' ? transformFunc(child) : child);
+      }
+      newProps = {
+        ...newProps,
+        children
       };
     }
     if (Touchable.TOUCH_TARGET_DEBUG && newProps.onPress) {
